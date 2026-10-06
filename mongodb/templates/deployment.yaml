@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+    name: mongodb
+    namespace: roboshop    # Name space where the pods will be created.
+    # these are replica-set labels. 
+    labels: 
+        project: roboshop 
+        component: mongodb 
+        environment: dev
+        tier: db
+        purpose: deployment
+spec:
+    replicas: 1
+    selector:
+        #This is used to select the pods and create the replicaset for those pods. 
+        matchLabels:
+            project: roboshop 
+            component: mongodb 
+            environment: dev
+            tier: db
+            purpose: deployment
+    template:
+        metadata:
+            labels:
+                project: roboshop
+                component: mongodb
+                environment: dev
+                tier: db
+                purpose: deployment
+    spec:
+        containers:
+            - name: mongodb
+              image: "{{ .Value.deployment.imageRepo }}:{{ .Value.deployment.imageVersion }}"
+              readinessProbe:
+                tcpSocket:
+                    port: 27017
+                initialDelaySeconds: 10
+                periodSeconds: 5
+                failureThreshold: 3
+                successThreshold: 1
+              livenessProbe:
+                tcpSocket:
+                    port: 27017
+                initialDelaySeconds: 8
+                periodSeconds: 4
+                failureThreshold: 5
+                successThreshold: 2
+              imagePullPolicy: Always
+              ports:
+                - containerPort: 27017 # its a must to expose the port for the service to connect to the pod.

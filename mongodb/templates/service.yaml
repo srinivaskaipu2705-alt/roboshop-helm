@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+    name: mongodb
+    namespace: roboshop # Name space where the pods will be created.
+    # these are service labels.
+spec:
+    type: {{ .Values.service.type }}
+    selector:
+        project: roboshop 
+        component: mongodb 
+        tier: db
+    port:
+        - port: 27017  # srevice port which will be used by other pods to connect to this service.
+          targetPort: 27017 # pod port which will be used by the service to connect to the pod.
+          protocol: TCP
